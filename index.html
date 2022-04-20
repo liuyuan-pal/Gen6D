@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gen6D: Generalizable Model-Free 6-DoF Object Pose <br> Estimation from RGB Images</title>
+    <!-- Bootstrap -->
+    <link href="css/bootstrap-4.4.1.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </head>
+
+  <!-- cover -->
+  <section>
+    <div class="jumbotron text-center mt-0">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <h2>Gen6D: Generalizable Model-Free 6-DoF Object Pose <br> Estimation from RGB Images
+            </h2>
+            <h4 style="color:#5a6268;">ArXiv 2022</h4>
+            <hr>
+            <h6>
+                <a href="https://liuyuan-pal.github.io/" target="_blank">Yuan Liu</a><sup>1</sup>,
+                <a href="https://scholar.google.com/citations?user=bH6lBeMAAAAJ&hl=zh-CN" target="_blank">Yilin Wen</a><sup>1</sup>,
+                <a href="https://pengsida.net/" target="_blank">Sida Peng</a><sup>2</sup>,
+                <a href="https://clinplayer.github.io/" target="_blank">Cheng Lin</a><sup>3</sup>,
+                <a href="https://www.xxlong.site/" target="_blank">Xiaoxiao Long</a><sup>1</sup>,
+                <a href="https://homepages.inf.ed.ac.uk/tkomura/" target="_blank">Taku Komura</a><sup>1</sup>
+                <a href="https://engineering.tamu.edu/cse/profiles/Wang-Wenping.html" target="_blank">Wenping Wang</a><sup>4</sup></h6>
+            <p>
+                <sup>1</sup>The University of Hong Kong &nbsp;&nbsp;
+                <sup>2</sup>Zhejiang University &nbsp;&nbsp;
+                <sup>3</sup>Tencent &nbsp;&nbsp;&nbsp;&nbsp;
+                <sup>4</sup>Texas A&M University
+            </p>
+
+            <div class="row justify-content-center">
+              <div class="column">
+                  <p class="mb-5"><a class="btn btn-large btn-light" href="" role="button"  target="_blank">
+                    <i class="fa fa-file"></i> Paper</a> </p>
+              </div>
+              <div class="column">
+                  <p class="mb-5"><a class="btn btn-large btn-light" href="" role="button"  target="_blank">
+                    <i class="fa fa-github-alt"></i> Code [Coming soon]</a> </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- abstract -->
+  <section>
+    <div class="container">
+      <div class="row">
+        <div class="col-12 text-center">
+          <h3>Abstract</h3>
+            <hr style="margin-top:0px">
+            <h6 style="color:#8899a5"> Gen6D is able to predict unseen object poses on RGB images using posed images (reference images) of the object. </h6>
+<!--            <div align="center"> For an unseen objects, we can simply take. </div>-->
+            <video width="80%" playsinline="" autoplay="autoplay" loop="loop" preload="" muted="">
+                <source src="video/all_compressed.mp4" type="video/mp4">
+            </video>
+			<br>
+
+          <p class="text-left">
+                In this paper, we present a generalizable model-free 6-DoF object pose estimator called Gen6D. Existing generalizable pose estimators either need the high-quality object models or require additional depth maps or object masks in test time, which significantly limits their application scope. In contrast, our pose estimator only requires some posed images of the unseen object and is able to accurately predict poses of the object in arbitrary environments. Gen6D consists of an object detector, a viewpoint selector and a pose refiner, all of which do not require the 3D object model and can generalize to unseen objects. Experiments show that Gen6D achieves state-of-the-art results on two model-free datasets: the MOPED dataset and a new GenMOP dataset collected by us. In addition, on the LINEMOD dataset, Gen6D achieves competitive results compared with instance-specific pose estimators.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <br>
+
+  <!-- overview video -->
+<!--  <section>-->
+<!--    <div class="container">-->
+<!--      <div class="row">-->
+<!--        <div class="col-12 text-center">-->
+<!--            <h3>Overview video</h3>-->
+<!--            <hr style="margin-top:0px">-->
+<!--            <div class="embed-responsive embed-responsive-16by9">-->
+<!--                <iframe width="560" height="315" src="https://www.youtube.com/embed/RCJKdCX8gco" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </section>-->
+
+<!--  <br>-->
+
+  <section>
+    <div class="container">
+      <div class="row">
+        <div class="col-12 text-center">
+            <h2>Comparison</h2>
+            <hr style="margin-top:0px">
+            <video width="80%" playsinline="" autoplay="autoplay" loop="loop" preload="" muted="">
+                <source src="video/compare_compressed.mp4" type="video/mp4">
+            </video>
+
+          <p class="text-left">
+              Both <a href="https://openaccess.thecvf.com/content_ECCV_2018/html/Yi_Li_DeepIM_Deep_Iterative_ECCV_2018_paper.html" target="_blank">DeepIM </a> and Gen6D
+                  are trained on the same training dataset and generalize to these unseen objects.
+              Gen6D generalizes better than DeepIM due to the utilization of a feature volume-based refiner. <br>
+              <a href="https://openaccess.thecvf.com/content_CVPR_2019/html/Peng_PVNet_Pixel-Wise_Voting_Network_for_6DoF_Pose_Estimation_CVPR_2019_paper.html" target="_blank">PVNet</a>
+              is trained on the object using the input posed images. The posed images (about 200) are not enough to train a PVNet for accurate pose estimation.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <br>
+
+<!--  <section>-->
+<!--    <div class="container">-->
+<!--      <div class="row">-->
+<!--        <div class="col-12 text-center">-->
+<!--            <h2>Results with 10k per-scene training steps (~40min)</h2>-->
+<!--            <hr style="margin-top:0px">-->
+<!--            <video width="100%" playsinline="" autoplay="autoplay" loop="loop" preload="" muted="">-->
+<!--                <source src="video/nerf_syn_ft_comparison.mp4" type="video/mp4">-->
+<!--            </video>-->
+<!--            <video width="100%" playsinline="" autoplay="autoplay" loop="loop" preload="" muted="">-->
+<!--                <source src="video/nerf_syn_ft.mp4" type="video/mp4">-->
+<!--            </video>-->
+<!--            <video width="100%" playsinline="" autoplay="autoplay" loop="loop" preload="" muted="">-->
+<!--                <source src="video/dtu_ft.mp4" type="video/mp4">-->
+<!--            </video>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </section>-->
+<!--  <br>-->
+
+  <section>
+    <div class="container">
+      <div class="row">
+        <div class="col-12 text-center">
+            <h2>Application</h2>
+            <hr style="margin-top:0px">
+            <video width="80%" playsinline="" autoplay="autoplay" loop="loop" preload="" muted="">
+                <source src="video/app_compressed.mp4" type="video/mp4">
+            </video>
+
+          <p class="text-left">
+            A simple AR application: With the known poses, we are able to render an adorable
+            <a href="https://sketchfab.com/3d-models/dodoco-king-genshin-impact-3dc47f3dd2b64cac970c0db37753d24f" target="_blank">
+                Dodoco</a> to replace the cute <a href="https://www.myplasticheart.com/lulu-piggy-blind-box-by-cicis-story/" target="_blank">Lulu Piggy</a>.
+              Gen6D does not require the object model nor the object mask.
+              By simply capturing reference images of an unseen object by cellphones and
+              recovering the poses of reference images by <a href="https://colmap.github.io/" target="_blank">COLMAP</a>,
+              Gen6D is able to predict the object pose on arbitrary query images. Thus, Gen6D can be easily applied on daily objects for AR/VR applications.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <br>
+
+  <!-- citing -->
+<!--  <div class="container">-->
+<!--    <div class="row ">-->
+<!--      <div class="col-12">-->
+<!--          <h3>Citation</h3>-->
+<!--          <hr style="margin-top:0px">-->
+<!--              <pre style="background-color: #e9eeef;padding: 1.25em 1.5em">-->
+<!--<code>@inproceedings{liu2022neuray,-->
+<!--  title={Neural Rays for Occlusion-aware Image-based Rendering},-->
+<!--  author={Liu, Yuan and Peng, Sida and Liu, Lingjie and Wang, Qianqian and Wang, Peng and Christian, Theobalt and Zhou, Xiaowei and Wang, Wenping},-->
+<!--  booktitle={CVPR},-->
+<!--  year={2022}-->
+<!--}</code></pre>-->
+<!--          <hr>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+
+  <footer class="text-center" style="margin-bottom:10px">
+      Thanks to <a href="https://lioryariv.github.io/" target="_blank">Lior Yariv</a> for the website template.
+  </footer>
+
+</body>
+</html>
