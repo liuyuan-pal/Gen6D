@@ -1,0 +1,3 @@
+name: selector_pretrain
+network: selector
+selector_angle_num: 5

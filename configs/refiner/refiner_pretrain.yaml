@@ -1,0 +1,3 @@
+name: refiner_pretrain
+network: refiner
+refiner_sample_num: 32
