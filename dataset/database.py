@@ -1,20 +1,14 @@
 import abc
 import glob
-import gzip
 from pathlib import Path
-import random
-from typing import List
 
 import numpy as np
-import cv2
 import os
 
 import plyfile
-from PIL import Image
-from skimage.io import imread, imsave
-from tqdm import tqdm
+from skimage.io import imread
 
-from utils.base_utils import read_pickle, save_pickle, sample_fps_points, pose_compose, load_point_cloud
+from utils.base_utils import read_pickle, save_pickle, pose_compose, load_point_cloud
 from utils.read_write_model import read_model
 
 SUN_IMAGE_ROOT = 'data/SUN2012pascalformat/JPEGImages'
@@ -69,9 +63,11 @@ class BaseDatabase(abc.ABC):
     def get_img_ids(self):
         pass
 
-    @abc.abstractmethod
     def get_mask(self,img_id):
-        pass
+        # dummy mask
+        img = self.get_image(img_id)
+        h, w = img.shape[:2]
+        return np.ones([h,w],np.bool)
 
 LINEMOD_ROOT='data/LINEMOD'
 class LINEMODDatabase(BaseDatabase):
@@ -187,6 +183,22 @@ class GenMOPMetaInfoWrapper:
         R = np.stack([x, y, vert], 0)
         return R
 
+def parse_colmap_project(cameras, images, img_fns):
+    img_id2db_id = {v.name[:-4]:k for k, v in images.items()}
+    poses, Ks = {}, {}
+    img_ids = [str(k) for k in range(len(img_fns))]
+    for img_id in img_ids:
+        if img_id not in img_id2db_id: continue
+        db_id = img_id2db_id[img_id]
+        R = images[db_id].qvec2rotmat()
+        t = images[db_id].tvec
+        pose = np.concatenate([R,t[:,None]],1).astype(np.float32)
+        poses[img_id]=pose
+
+        cam_id = images[db_id].camera_id
+        f, cx, cy, _ = cameras[cam_id].params
+        Ks[img_id] = np.asarray([[f,0,cx], [0,f,cy], [0,0,1]],np.float32)
+    return poses, Ks, img_ids
 
 class GenMOPDatabase(BaseDatabase):
     def __init__(self, database_name):
@@ -202,20 +214,7 @@ class GenMOPDatabase(BaseDatabase):
 
         # parse colmap project
         cameras, images, points3d = read_model(f'{GenMOP_ROOT}/{seq_name}/colmap-all/colmap_default-colmap_default/sparse/0')
-        img_id2db_id = {v.name[:-4]:k for k, v in images.items()}
-        self.poses, self.Ks = {}, {}
-        self.img_ids = [str(k) for k in range(len(self.img_fns))]
-        for img_id in self.img_ids:
-            if img_id not in img_id2db_id: continue
-            db_id = img_id2db_id[img_id]
-            R = images[db_id].qvec2rotmat()
-            t = images[db_id].tvec
-            pose = np.concatenate([R,t[:,None]],1).astype(np.float32)
-            self.poses[img_id]=pose
-
-            cam_id = images[db_id].camera_id
-            f, cx, cy, _ = cameras[cam_id].params
-            self.Ks[img_id] = np.asarray([[f,0,cx], [0,f,cy], [0,0,1]],np.float32)
+        self.poses, self.Ks, self.img_ids = parse_colmap_project(cameras, images, self.img_fns)
 
         # align test sequence to the reference sequence
         object_name, database_type = seq_name.split('-')
@@ -243,16 +242,68 @@ class GenMOPDatabase(BaseDatabase):
     def get_img_ids(self):
         return self.img_ids
 
-    def get_mask(self, img_id):
-        # dummy mask
-        img = self.get_image(img_id)
-        h, w = img.shape[:2]
-        return np.ones([h,w],np.bool)
+class CustomDatabase(BaseDatabase):
+    def __init__(self, database_name):
+        super().__init__(database_name)
+        self.root = Path(os.path.join('data',database_name))
+        self.img_dir = self.root / 'images'
+        if (self.root/'img_fns.pkl').exists():
+            self.img_fns = read_pickle(str(self.root/'img_fns.pkl'))
+        else:
+            self.img_fns = [Path(fn).name for fn in glob.glob(str(self.img_dir)+'/*.jpg')]
+            save_pickle(self.img_fns, str(self.root/'img_fns.pkl'))
+
+        self.colmap_root = self.root / 'colmap'
+        if (self.colmap_root / 'sparse' / '0').exists():
+            cameras, images, points3d = read_model(str(self.colmap_root / 'sparse' / '0'))
+            self.poses, self.Ks, self.img_ids = parse_colmap_project(cameras, images, self.img_fns)
+        else:
+            self.img_ids = [str(k) for k in range(len(self.img_fns))]
+            self.poses, self.Ks = {}, {}
+
+        if len(self.poses.keys())>0:
+            # read meta information to scale and rotate
+            directions = np.loadtxt(str(self.root/'meta_info.txt'))
+            x = directions[0]
+            z = directions[1]
+            self.object_point_cloud = load_point_cloud(f'{self.root}/object_point_cloud.ply')
+            # rotate
+            self.rotation = GenMOPMetaInfoWrapper.compute_rotation(z, x)
+            self.object_point_cloud = (self.object_point_cloud @ self.rotation.T)
+
+            # scale
+            self.scale_ratio = GenMOPMetaInfoWrapper.compute_normalized_ratio(self.object_point_cloud)
+            self.object_point_cloud = self.object_point_cloud * self.scale_ratio
+
+            min_pt = np.min(self.object_point_cloud, 0)
+            max_pt = np.max(self.object_point_cloud, 0)
+            self.center = (max_pt + min_pt) / 2
+
+            # modify poses
+            for k, pose in self.poses.items():
+                R = pose[:3, :3]
+                t = pose[:3, 3:]
+                R = R @ self.rotation.T
+                t = self.scale_ratio * t
+                self.poses[k] = np.concatenate([R,t], 1).astype(np.float32)
+
+    def get_image(self, img_id):
+        return imread(str(self.img_dir/self.img_fns[int(img_id)]))
+
+    def get_K(self, img_id):
+        return self.Ks[img_id].copy()
+
+    def get_pose(self, img_id):
+        return self.poses[img_id].copy()
+
+    def get_img_ids(self):
+        return self.img_ids
 
 def parse_database_name(database_name:str)->BaseDatabase:
     name2database={
         'linemod': LINEMODDatabase,
         'genmop': GenMOPDatabase,
+        'custom': CustomDatabase,
     }
     database_type = database_name.split('/')[0]
     if database_type in name2database:
@@ -281,6 +332,8 @@ def get_ref_point_cloud(database):
         ref_point_cloud = database.model
     elif isinstance(database, GenMOPDatabase):
         ref_point_cloud = database.meta_info.object_point_cloud
+    elif isinstance(database, CustomDatabase):
+        ref_point_cloud = database.object_point_cloud
     else:
         raise NotImplementedError
     return ref_point_cloud
@@ -293,6 +346,8 @@ def get_diameter(database):
         return 2.0 # we already align and scale it
     elif isinstance(database, NormalizedDatabase):
         return 2.0
+    elif isinstance(database, CustomDatabase):
+        return 2.0
     else:
         raise NotImplementedError
 
@@ -301,6 +356,8 @@ def get_object_center(database):
         return database.object_center
     elif isinstance(database, GenMOPDatabase):
         return database.meta_info.center
+    elif isinstance(database, CustomDatabase):
+        return database.center
     elif isinstance(database, NormalizedDatabase):
         return np.zeros(3,dtype=np.float32)
     else:
@@ -310,6 +367,8 @@ def get_object_vert(database):
     if isinstance(database, LINEMODDatabase):
         return database.object_vert
     elif isinstance(database, GenMOPDatabase):
+        return np.asarray([0,0,1], np.float32)
+    elif isinstance(database, CustomDatabase):
         return np.asarray([0,0,1], np.float32)
     else:
         raise NotImplementedError

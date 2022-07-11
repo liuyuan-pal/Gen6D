@@ -1,11 +1,15 @@
 # Gen6D
 
+Gen6D is able to estimate 6DoF poses for unseen objects like the following video.
+
+![](assets/example.gif)
+
 ## [Project page](https://liuyuan-pal.github.io/Gen6D/) | [Paper](https://arxiv.org/abs/2204.10776)
 
 ## Todo List
 
 - [x] Pretrained models and evaluation codes.
-- [ ] Pose estimation on custom objects.
+- [x] Pose estimation on custom objects.
 - [ ] Training codes.
 
 ## Installation
@@ -19,7 +23,7 @@ Required packages are list in `requirements.txt`.
 ```
 Gen6D
 |-- data
-    |--model
+    |-- model
         |-- detector_pretrain
             |-- model_best.pth
         |-- selector_pretrain
@@ -73,11 +77,16 @@ Subsequent 5 rows show the predicted (left) or ground-truth (right) 5 reference 
 This image shows the pose refinement process.
 The red bbox represents the input pose, the green one represents the ground-truth and the blue one represents the output pose for the current refinement step. 
 
+## Pose estimation on custom objects
+
+Please refer to [custom_object.md](custom_object.md)
+
 ## Acknowledgements
 In this repository, we have used codes or datasets from the following repositories. 
 We thank all the authors for sharing great codes or datasets.
 
 - [PVNet](https://github.com/zju3dv/pvnet)
+- [hloc](https://github.com/cvg/Hierarchical-Localization)
 - [COLMAP](https://github.com/colmap/colmap)
 - [Google Scanned Objects](https://app.ignitionrobotics.org/GoogleResearch/fuel/collections/Google%20Scanned%20Objects)
 - [MVSNet_pl](https://github.com/kwea123/MVSNet_pl)
