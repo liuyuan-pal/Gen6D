@@ -5,11 +5,12 @@ import torchvision
 import numpy as np
 
 from dataset.database import NormalizedDatabase, normalize_pose, get_object_center, get_diameter, denormalize_pose
-from network.operator import pose_apply_th, imgs_info_to_torch, normalize_coords
+from network.operator import pose_apply_th, normalize_coords
 from network.pretrain_models import VGGBNPretrainV3
 from utils.base_utils import pose_inverse, project_points, color_map_forward, to_cuda, pose_compose
 from utils.database_utils import look_at_crop, select_reference_img_ids_refinement, normalize_reference_views
 from utils.pose_utils import let_me_look_at, compose_sim_pose, pose_sim_to_pose_rigid
+from utils.imgs_info import imgs_info_to_torch
 
 
 class RefineFeatureNet(nn.Module):

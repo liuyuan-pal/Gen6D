@@ -4,5 +4,9 @@ opencv-python
 transforms3d
 numpy
 plyfile
-skimage
+scikit-image
 matplotlib
+open3d
+pytorch3d
+tensorboardX
+tqdm

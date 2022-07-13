@@ -6,6 +6,8 @@ import torchvision
 
 from network.pretrain_models import VGGBNPretrain
 from utils.base_utils import color_map_forward, transformation_crop, to_cpu_numpy
+from utils.bbox_utils import parse_bbox_from_scale_offset
+
 
 class BaseDetector(nn.Module):
     def load_impl(self, ref_imgs):
@@ -202,26 +204,6 @@ class Detector(BaseDetector):
         rfn, _, h, w = ref_imgs.shape
         self.ref_shape = [h, w]
 
-    # @staticmethod
-    # def _check_scores(scores,que_img,name):
-    #     import cv2
-    #     from utils.base_utils import color_map_backward
-    #     from utils.draw_utils import concat_images_list
-    #     from skimage.io import imsave
-    #     scores = scores.detach().cpu().numpy() # qn,rfn,hr,wr
-    #     qn, _, h, w = que_img.shape
-    #     qn, rfn, _, _ = scores.shape
-    #     imgs = [color_map_backward(que_img.cpu().numpy())[0].transpose([1,2,0])]
-    #     for rfi in range(rfn):
-    #         score_img = scores[0, rfi]
-    #         score_img /= np.max(score_img)
-    #         score_img = color_map_backward(score_img)
-    #         score_img = cv2.resize(score_img, (w, h), interpolation=cv2.INTER_LINEAR)
-    #         score_img = np.repeat(score_img[:,:,None],3,2)
-    #         imgs.append(score_img)
-    #
-    #     imsave(name,concat_images_list(*imgs,vert=True))
-
     def normalize_scores(self,scores0,scores1,scores2):
         stats = self.cfg['vgg_score_stats']
         scores0 = (scores0 - stats[0][0])/stats[0][1]
@@ -243,11 +225,6 @@ class Detector(BaseDetector):
         scores2 = F.interpolate(scores2, scale_factor=4)
         scores1 = F.interpolate(scores1, scale_factor=2)
         scores0, scores1, scores2 = self.normalize_scores(scores0, scores1, scores2)
-
-        # self._check_scores(scores0, que_imgs,f'data/analyze/score0.jpg')
-        # self._check_scores(scores1, que_imgs,f'data/analyze/score1.jpg')
-        # self._check_scores(scores2, que_imgs,f'data/analyze/score2.jpg')
-        # import ipdb; ipdb.set_trace()
 
         scores = torch.stack([scores0, scores1, scores2],1) # qn,3,rfn,hq/8,wq/8
         return scores

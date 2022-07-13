@@ -1,0 +1,67 @@
+name: refiner_train
+network: refiner
+refiner_sample_num: 32
+
+##########loss##############
+loss: [refiner_loss]
+val_metric: [ref_metrics]
+key_metric_name: pose_add
+output_interval: 15
+
+###########dataset##########
+collate_fn: simple
+train_loader_batch_size: 2
+val_loader_batch_size: 1
+train_dataset_type: ref_train
+train_dataset_cfg:
+    batch_size: 1
+    use_database_sample_prob: true
+    database_sample_prob: [ 40, 10, 10, 10 ]
+    database_names: ['shapenet_train', 'gso_train_128', 'linemod_train', 'genmop_train' ]
+
+    refine_scale_range: [-0.3, 0.3]
+    refine_rotation_range: [-15, 15]
+    refine_offset_std: 4
+    refine_ref_num: 6
+    refine_ref_resolution: 128
+    refine_view_cfg: v3
+    refine_ref_ids_version: fps
+
+val_set_list:
+    -
+        name: warrior_val
+        type: ref_val
+        cfg:
+            ref_database_name: genmop/tformer-ref
+            test_database_name: genmop/tformer-test
+            ref_split_type: all
+            test_split_type: all
+            detector_name: detector_train
+            selector_name: selector_train
+            refine_ref_num: 6
+            refine_ref_resolution: 128
+    -
+        name: cat_val
+        type: ref_val
+        cfg:
+            ref_database_name: linemod/cat
+            test_database_name: linemod/cat
+            ref_split_type: linemod_val
+            test_split_type: linemod_val
+            detector_name: detector_train
+            selector_name: selector_train
+            refine_ref_num: 6
+            refine_ref_resolution: 128
+
+##########optimizer##########
+optimizer_type: adam
+lr_type: exp_decay
+lr_cfg:
+    lr_init: 1.0e-4
+    decay_step: 100000
+    decay_rate: 0.5
+total_step: 300001
+train_log_step: 50
+val_interval: 5000
+save_interval: 500
+worker_num: 8

@@ -10,7 +10,7 @@ Gen6D is able to estimate 6DoF poses for unseen objects like the following video
 
 - [x] Pretrained models and evaluation codes.
 - [x] Pose estimation on custom objects.
-- [ ] Training codes.
+- [x] Training codes.
 
 ## Installation
 
@@ -81,6 +81,70 @@ The red bbox represents the input pose, the green one represents the ground-trut
 
 Please refer to [custom_object.md](custom_object.md)
 
+## Training
+1. Download processed [co3d](https://ai.facebook.com/datasets/CO3D-dataset/) data (co3d.tar.gz), [google scanned objects](https://arxiv.org/abs/2204.11918) data (gso.tar.gz) and [ShapeNet](http://shapenet.org/) renderings (shapenet.tar.gz and shapenet_cache.tar.gz) at [here](https://connecthkuhk-my.sharepoint.com/:f:/g/personal/yuanly_connect_hku_hk/EkWESLayIVdEov4YlVrRShQBkOVTJwgK0bjF7chFg2GrBg?e=Y8UpXu).
+2. Download [COCO](https://cocodataset.org/#download) 2017 training set.
+3. Organize files like
+```shell
+Gen6D
+|-- data
+    |-- GenMOP
+        |-- chair 
+            ...
+    |-- LINEMOD
+        |-- cat 
+            ...
+    |-- shapenet
+        |-- shapenet_cache
+        |-- shapenet_render
+        |-- shapenet_render_v1.pkl
+    |-- co3d_256_512
+        |-- apple
+            ...
+    |-- google_scanned_objects
+        |-- 06K3jXvzqIM
+            ...
+    |-- coco
+        |-- train2017
+```
+4. Train the detector
+```shell
+python train_model.py --cfg configs/detector/detector_train.yaml
+```
+5. Train the selector
+```shell
+python train_model.py --cfg configs/selector/selector_train.yaml
+```
+6. Prepare the validation data for training refiner
+```shell
+python prepare.py --action gen_val_set \
+                  --estimator_cfg configs/gen6d_train.yaml \
+                  --que_database linemod/cat \
+                  --que_split linemod_val \
+                  --ref_database linemod/cat \
+                  --ref_split linemod_val
+
+python prepare.py --action gen_val_set \
+                  --estimator_cfg configs/gen6d_train.yaml \
+                  --que_database genmop/tformer-test \
+                  --que_split all \
+                  --ref_database genmop/tformer-ref \
+                  --ref_split all 
+```
+This command will generate the information in the `data/val`, which will be used in producing validation data for the refiner.
+7. Train the refiner
+```shell
+python train_model.py --cfg configs/selector/refiner_train.yaml
+```
+8. Evaluate all components together.
+```shell
+# Evaluate on the object TFormer from the GenMOP dataset
+python eval.py --cfg configs/gen6d_train.yaml --object_name genmop/tformer
+
+# Evaluate on the object cat from the LINEMOD dataset
+python eval.py --cfg configs/gen6d_train.yaml --object_name linemod/cat
+```
+
 ## Acknowledgements
 In this repository, we have used codes or datasets from the following repositories. 
 We thank all the authors for sharing great codes or datasets.
@@ -88,6 +152,9 @@ We thank all the authors for sharing great codes or datasets.
 - [PVNet](https://github.com/zju3dv/pvnet)
 - [hloc](https://github.com/cvg/Hierarchical-Localization)
 - [COLMAP](https://github.com/colmap/colmap)
+- [ShapeNet](http://shapenet.org/)
+- [COCO](https://cocodataset.org/#download)
+- [Co3D](https://ai.facebook.com/datasets/CO3D-dataset/)
 - [Google Scanned Objects](https://app.ignitionrobotics.org/GoogleResearch/fuel/collections/Google%20Scanned%20Objects)
 - [MVSNet_pl](https://github.com/kwea123/MVSNet_pl)
 - [AnnotationTools](https://github.com/luigivieira/Facial-Landmarks-Annotation-Tool)

@@ -1,0 +1,65 @@
+name: detector_train
+network: detector
+detection_scales: [-1.0,-0.5,0.0,0.5]
+
+##########loss##############
+loss: [detection_softmax, detection_offset_scale]
+val_metric: [vis_bbox_scale]
+key_metric_name: mean_iou
+score_diff_thresh: 1.0
+use_ref_view_mask: false
+output_interval: 15
+use_offset_loss: true
+
+###########dataset##########
+train_dataset_type: det_train
+train_dataset_cfg:
+  use_database_sample_prob: true
+  database_sample_prob: [ 100, 10, 30, 10, 10 ]
+  database_names: ['co3d_train', 'gso_train_128', 'shapenet_train', 'linemod_train', 'genmop_train']
+  batch_size: 4
+
+  ref_type: fps_32
+  detector_scale_range: [-0.5, 1.2]
+  detector_rotation_range: [-22.5, 22.5]
+
+  resolution: 128
+  reference_num: 32
+
+  que_add_background_objects: true
+  que_background_objects_num: 2
+  que_background_objects_ratio: 0.3
+
+  offset_type: random
+  detector_offset_std: 3
+  detector_real_aug_rot: true
+
+val_set_list:
+  -
+    name: cat_val
+    type: det_val
+    cfg:
+      ref_database_name: linemod/cat
+      test_database_name: linemod/cat
+      ref_split_type: linemod_val
+      test_split_type: linemod_val
+  -
+    name: warrior_val
+    type: det_val
+    cfg:
+      ref_database_name: genmop/tformer-ref
+      test_database_name: genmop/tformer-test
+      ref_split_type: all
+      test_split_type: all
+
+##########optimizer##########
+optimizer_type: adam
+lr_type: exp_decay
+lr_cfg:
+  lr_init: 1.0e-4
+  decay_step: 100000
+  decay_rate: 0.5
+total_step: 300000
+train_log_step: 50
+val_interval: 5000
+save_interval: 500

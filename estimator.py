@@ -109,7 +109,10 @@ class Gen6DEstimator:
 
         self.detector = self._load_module(self.cfg['detector'])
         self.selector = self._load_module(self.cfg['selector'])
-        self.refiner = self._load_module(self.cfg['refiner'])
+        if self.cfg['refiner'] is not None:
+            self.refiner = self._load_module(self.cfg['refiner'])
+        else:
+            self.refiner = None
 
     @staticmethod
     def _load_module(cfg):
@@ -164,7 +167,8 @@ class Gen6DEstimator:
         self.selector.load_ref_imgs(ref_imgs_rots, ref_poses, object_center, object_vert)
         self.ref_info={'imgs': ref_imgs, 'ref_imgs': ref_imgs_rots, 'masks': ref_masks, 'Ks': ref_Ks, 'poses': ref_poses, 'center': object_center}
 
-        self.refiner.load_ref_imgs(database, ref_ids_all)
+        if self.refiner is not None:
+            self.refiner.load_ref_imgs(database, ref_ids_all)
 
     def predict(self, que_img, que_K, pose_init=None):
         inter_results={}
@@ -203,11 +207,12 @@ class Gen6DEstimator:
             pose_pr = pose_init
 
         # stage 4: refine pose
-        refine_poses = [pose_pr]
-        for k in range(self.cfg['refine_iter']):
-            pose_pr = self.refiner.refine_que_imgs(que_img, que_K, pose_pr, size=128, ref_num=6, ref_even=True)
-            refine_poses.append(pose_pr)
-        inter_results['refine_poses'] = refine_poses
+        if self.refiner is not None:
+            refine_poses = [pose_pr]
+            for k in range(self.cfg['refine_iter']):
+                pose_pr = self.refiner.refine_que_imgs(que_img, que_K, pose_pr, size=128, ref_num=6, ref_even=True)
+                refine_poses.append(pose_pr)
+            inter_results['refine_poses'] = refine_poses
         return pose_pr, inter_results
 
 name2estimator={

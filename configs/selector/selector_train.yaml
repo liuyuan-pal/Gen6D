@@ -1,0 +1,64 @@
+name: selector_train
+network: selector
+selector_angle_num: 5
+
+##########loss##############
+loss: [selection_loss]
+val_metric: [vis_sel]
+key_metric_name: sel_ang_acc
+output_interval: 15
+
+###########dataset##########
+train_dataset_type: sel_train
+train_dataset_cfg:
+  use_database_sample_prob: true
+  database_sample_prob: [ 10, 30, 10, 10 ]
+  database_names: [ 'gso_train_128', 'shapenet_train', 'linemod_train', 'genmop_train' ]
+
+  batch_size: 2
+  ref_type: fps_64
+
+  use_render: false
+  resolution: 128
+  reference_num: 64
+
+  selector_scale_range: [-0.3, 0.3]
+  selector_angle_range: [-90, 90]
+  selector_angles: [-90, -45, 0, 45, 90]
+  selector_real_aug: true
+
+val_set_list:
+  -
+    name: cat_val
+    type: sel_val
+    cfg:
+      ref_database_name: linemod/cat
+      test_database_name: linemod/cat
+      ref_split_type: linemod_val
+      test_split_type: linemod_val
+      selector_angles: [-90, -45, 0, 45, 90]
+      selector_ref_num: 64
+      selector_ref_res: 128
+  -
+    name: warrior_val
+    type: sel_val
+    cfg:
+      ref_database_name: genmop/tformer-ref
+      test_database_name: genmop/tformer-test
+      ref_split_type: all
+      test_split_type: all
+      selector_angles: [-90, -45, 0, 45, 90]
+      selector_ref_num: 64
+      selector_ref_res: 128
+
+##########optimizer##########
+optimizer_type: adam
+lr_type: exp_decay
+lr_cfg:
+  lr_init: 1.0e-4
+  decay_step: 100000
+  decay_rate: 0.5
+total_step: 300000
+train_log_step: 50
+val_interval: 5000
+save_interval: 500

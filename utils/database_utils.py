@@ -51,7 +51,9 @@ def compute_normalized_view_correlation(que_poses,ref_poses, center, th=True):
         corr = np.sum(que_cams[:,None,:]*ref_cams[None,:,:], 2) # qn,rfn
     return corr
 
-def normalize_reference_views(database, ref_ids, size, margin, rectify_rot=True, input_pose=None, input_K=None):
+def normalize_reference_views(database, ref_ids, size, margin,
+                              rectify_rot=True, input_pose=None, input_K=None,
+                              add_rots=False, rots_list=None):
     object_center = get_object_center(database)
     object_diameter = get_diameter(database)
 
@@ -83,9 +85,12 @@ def normalize_reference_views(database, ref_ids, size, margin, rectify_rot=True,
     else:
         ref_vert_angle = np.zeros(len(ref_ids),np.float32)
 
-    ref_imgs_new, ref_Ks_new, ref_poses_new, ref_Hs, ref_masks_new = [], [], [], [], []
+    ref_imgs_new, ref_Ks_new, ref_poses_new, ref_Hs, ref_masks_new, ref_imgs_rots = [], [], [], [], [], []
     for k in range(len(ref_ids)):
         ref_img = database.get_image(ref_ids[k])
+        if add_rots:
+            ref_img_rot = np.stack([look_at_crop(ref_img, ref_Ks[k], ref_poses[k], ref_cens[k], ref_vert_angle[k]+rot, ref_scales[k], size, size)[0] for rot in rots_list],0)
+            ref_imgs_rots.append(ref_img_rot)
 
         ref_img_new, ref_K_new, ref_pose_new, ref_pose_rect, ref_H = look_at_crop(
             ref_img, ref_Ks[k], ref_poses[k], ref_cens[k], ref_vert_angle[k], ref_scales[k], size, size)
@@ -98,6 +103,10 @@ def normalize_reference_views(database, ref_ids, size, margin, rectify_rot=True,
 
     ref_imgs_new, ref_Ks_new, ref_poses_new, ref_Hs, ref_masks_new = \
         np.stack(ref_imgs_new, 0), np.stack(ref_Ks_new,0), np.stack(ref_poses_new,0), np.stack(ref_Hs,0), np.stack(ref_masks_new,0)
+
+    if add_rots:
+        ref_imgs_rots = np.stack(ref_imgs_rots,1)
+        return ref_imgs_new, ref_masks_new, ref_Ks_new, ref_poses_new, ref_Hs, ref_imgs_rots
     return ref_imgs_new, ref_masks_new, ref_Ks_new, ref_poses_new, ref_Hs
 
 def select_reference_img_ids_fps(database, ref_ids_all, ref_num, random_fps=False):
