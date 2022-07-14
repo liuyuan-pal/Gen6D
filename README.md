@@ -82,7 +82,7 @@ The red bbox represents the input pose, the green one represents the ground-trut
 Please refer to [custom_object.md](custom_object.md)
 
 ## Training
-1. Download processed [co3d](https://ai.facebook.com/datasets/CO3D-dataset/) data (co3d.tar.gz), [google scanned objects](https://arxiv.org/abs/2204.11918) data (gso.tar.gz) and [ShapeNet](http://shapenet.org/) renderings (shapenet.tar.gz and shapenet_cache.tar.gz) at [here](https://connecthkuhk-my.sharepoint.com/:f:/g/personal/yuanly_connect_hku_hk/EkWESLayIVdEov4YlVrRShQBkOVTJwgK0bjF7chFg2GrBg?e=Y8UpXu).
+1. Download processed [co3d](https://ai.facebook.com/datasets/CO3D-dataset/) data (co3d.tar.gz), [google scanned objects](https://arxiv.org/abs/2204.11918) data (google_scanned_objects.tar.gz) and [ShapeNet](http://shapenet.org/) renderings (shapenet.tar.gz) at [here](https://connecthkuhk-my.sharepoint.com/:f:/g/personal/yuanly_connect_hku_hk/EkWESLayIVdEov4YlVrRShQBkOVTJwgK0bjF7chFg2GrBg?e=Y8UpXu).
 2. Download [COCO](https://cocodataset.org/#download) 2017 training set.
 3. Organize files like
 ```shell
@@ -158,6 +158,8 @@ We thank all the authors for sharing great codes or datasets.
 - [Google Scanned Objects](https://app.ignitionrobotics.org/GoogleResearch/fuel/collections/Google%20Scanned%20Objects)
 - [MVSNet_pl](https://github.com/kwea123/MVSNet_pl)
 - [AnnotationTools](https://github.com/luigivieira/Facial-Landmarks-Annotation-Tool)
+
+We provide a paper list about recent generalizable 6-DoF object pose estimators at [https://github.com/liuyuan-pal/Awsome-generalizable-6D-object-pose](https://github.com/liuyuan-pal/Awsome-generalizable-6D-object-pose).
 
 ## Citation
 ```
