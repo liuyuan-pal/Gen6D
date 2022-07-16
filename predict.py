@@ -8,6 +8,7 @@ from tqdm import tqdm
 
 from dataset.database import parse_database_name, get_ref_point_cloud
 from estimator import name2estimator
+from eval import visualize_intermediate_results
 from prepare import video2image
 from utils.base_utils import load_cfg, project_points
 from utils.draw_utils import pts_range_to_bbox_pts, draw_bbox_3d
@@ -38,6 +39,7 @@ def main(args):
 
     (output_dir / 'images_raw').mkdir(exist_ok=True, parents=True)
     (output_dir / 'images_out').mkdir(exist_ok=True, parents=True)
+    (output_dir / 'images_inter').mkdir(exist_ok=True, parents=True)
     (output_dir / 'images_out_smooth').mkdir(exist_ok=True, parents=True)
 
     que_num = video2image(args.video, output_dir/'images_raw', 1, args.resolution, args.transpose)
@@ -51,6 +53,8 @@ def main(args):
         f=np.sqrt(h**2+w**2)
         K = np.asarray([[f,0,w/2],[0,f,h/2],[0,0,1]],np.float32)
 
+        if pose_init is not None:
+            estimator.cfg['refine_iter'] = 1 # we only refine one time after initialization
         pose_pr, inter_results = estimator.predict(img, K, pose_init=pose_init)
         pose_init = pose_pr
 
@@ -58,6 +62,7 @@ def main(args):
         bbox_img = draw_bbox_3d(img, pts, (0,0,255))
         imsave(f'{str(output_dir)}/images_out/{que_id}-bbox.jpg', bbox_img)
         np.save(f'{str(output_dir)}/images_out/{que_id}-pose.npy', pose_pr)
+        imsave(f'{str(output_dir)}/images_inter/{que_id}.jpg', visualize_intermediate_results(img, K, inter_results, estimator.ref_info, object_bbox_3d))
 
         hist_pts.append(pts)
         pts_ = weighted_pts(hist_pts, weight_num=args.num, std_inv=args.std)
