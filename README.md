@@ -14,7 +14,7 @@ Gen6D is able to estimate 6DoF poses for unseen objects like the following video
 
 ## Installation
 
-Required packages are list in `requirements.txt`. 
+Required packages are list in `requirements.txt`. To determine how to install PyTorch along with CUDA please refer to [pytorch-documentation](https://pytorch.org/get-started/locally/)
 
 ## Download
 
