@@ -8,5 +8,7 @@ scikit-image
 matplotlib
 open3d
 pytorch3d
+pyyaml
+cudatoolkit
 tensorboardX
 tqdm
