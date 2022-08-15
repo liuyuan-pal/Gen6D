@@ -33,29 +33,30 @@ def visualize_intermediate_results(img, K, inter_results, ref_info, object_bbox_
             get_gt_info(pose_gt, K, ref_info['poses'], ref_info['Ks'], object_center)
 
     output_imgs = []
-    # visualize detection
-    det_scale_r2q = inter_results['det_scale_r2q']
-    det_position = inter_results['det_position']
-    det_que_img = inter_results['det_que_img']
-    size = det_que_img.shape[0]
-    pr_bbox = np.concatenate([det_position - size / 2 * det_scale_r2q, np.full(2, size) * det_scale_r2q])
-    bbox_img = img
-    if pose_gt is not None: bbox_img = draw_bbox(bbox_img, gt_bbox, color=(0, 255, 0))
-    bbox_img = draw_bbox(bbox_img, pr_bbox, color=(0, 0, 255))
-    output_imgs.append(bbox_img)
+    if 'det_scale_r2q' in inter_results and 'sel_angle_r2q' in inter_results:
+        # visualize detection
+        det_scale_r2q = inter_results['det_scale_r2q']
+        det_position = inter_results['det_position']
+        det_que_img = inter_results['det_que_img']
+        size = det_que_img.shape[0]
+        pr_bbox = np.concatenate([det_position - size / 2 * det_scale_r2q, np.full(2, size) * det_scale_r2q])
+        bbox_img = img
+        if pose_gt is not None: bbox_img = draw_bbox(bbox_img, gt_bbox, color=(0, 255, 0))
+        bbox_img = draw_bbox(bbox_img, pr_bbox, color=(0, 0, 255))
+        output_imgs.append(bbox_img)
 
-    # visualize selection
-    sel_angle_r2q = inter_results['sel_angle_r2q']  #
-    sel_scores = inter_results['sel_scores']  #
-    h, w, _ = det_que_img.shape
-    sel_img_rot, _ = transformation_crop(det_que_img, np.asarray([w / 2, h / 2], np.float32), 1.0, -sel_angle_r2q, h)
-    an = ref_imgs.shape[0]
-    sel_img = concat_images_list(det_que_img, sel_img_rot, *[ref_imgs[an // 2, score_idx] for score_idx in np.argsort(-sel_scores)[:5]], vert=True)
-    if pose_gt is not None:
-        sel_img_rot_gt, _ = transformation_crop(det_que_img, np.asarray([w/2, h/2], np.float32), 1.0, -gt_angle_r2q, h)
-        sel_img_gt = concat_images_list(det_que_img, sel_img_rot_gt, *[ref_imgs[an // 2, score_idx] for score_idx in np.argsort(-gt_scores)[:5]], vert=True)
-        sel_img = concat_images_list(sel_img, sel_img_gt)
-    output_imgs.append(sel_img)
+        # visualize selection
+        sel_angle_r2q = inter_results['sel_angle_r2q']  #
+        sel_scores = inter_results['sel_scores']  #
+        h, w, _ = det_que_img.shape
+        sel_img_rot, _ = transformation_crop(det_que_img, np.asarray([w / 2, h / 2], np.float32), 1.0, -sel_angle_r2q, h)
+        an = ref_imgs.shape[0]
+        sel_img = concat_images_list(det_que_img, sel_img_rot, *[ref_imgs[an // 2, score_idx] for score_idx in np.argsort(-sel_scores)[:5]], vert=True)
+        if pose_gt is not None:
+            sel_img_rot_gt, _ = transformation_crop(det_que_img, np.asarray([w/2, h/2], np.float32), 1.0, -gt_angle_r2q, h)
+            sel_img_gt = concat_images_list(det_que_img, sel_img_rot_gt, *[ref_imgs[an // 2, score_idx] for score_idx in np.argsort(-gt_scores)[:5]], vert=True)
+            sel_img = concat_images_list(sel_img, sel_img_gt)
+        output_imgs.append(sel_img)
 
     # visualize refinements
     refine_poses = inter_results['refine_poses']

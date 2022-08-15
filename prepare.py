@@ -3,6 +3,7 @@ from pathlib import Path
 
 import cv2
 import torch
+from skimage.io import imsave
 from tqdm import tqdm
 
 from colmap_script import build_colmap_model_no_pose
@@ -25,9 +26,17 @@ def video2image(input_video, output_dir, interval=30, image_size = 640, transpos
             ht, wt = int(ratio*h), int(ratio*w)
             image = cv2.resize(image,(wt,ht),interpolation=cv2.INTER_LINEAR)
             if transpose:
-                image = cv2.transpose(image)
-                image = cv2.flip(image, 1)
-            cv2.imwrite(f"{output_dir}/frame%d.jpg" % count, image)  # save frame as JPEG file
+                v0 = cv2.getVersionMajor()
+                v1 = cv2.getVersionMinor()
+                if v0>=4 and v1>=5:
+                    image = cv2.flip(image, 0)
+                    image = cv2.flip(image, 1)
+                else:
+                    image = cv2.transpose(image)
+                    image = cv2.flip(image, 1)
+
+            image = cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
+            imsave(f"{output_dir}/frame%d.jpg" % count, image)  # save frame as JPEG file
         success, image = vidcap.read()
         count += 1
     return count
