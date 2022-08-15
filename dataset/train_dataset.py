@@ -728,7 +728,7 @@ class DetectionValDataset(Dataset):
         "test_database_name": 'linemod/cat',
         "ref_database_name": 'linemod/cat',
         "test_split_type": "linemod_val",
-        "ref_split": "linemod_val",
+        "ref_split_type": "linemod_val",
         "detector_ref_num": 32,
         "detector_ref_res": 128,
     }
@@ -738,7 +738,7 @@ class DetectionValDataset(Dataset):
         assert(not is_train)
         self.test_database = parse_database_name(self.cfg['test_database_name'])
         self.ref_database = parse_database_name(self.cfg['ref_database_name'])
-        ref_ids, _ = get_database_split(self.ref_database,self.cfg['ref_split'])
+        ref_ids, _ = get_database_split(self.ref_database,self.cfg['ref_split_type'])
         _, self.test_ids = get_database_split(self.test_database,self.cfg['test_split_type'])
 
         ref_ids = select_reference_img_ids_fps(self.ref_database, ref_ids, self.cfg['detector_ref_num'])

@@ -435,6 +435,7 @@ class GoogleScannedObjectDatabase(BaseDatabase):
                 cv2.imwrite(str(fn), mask, [cv2.IMWRITE_PNG_COMPRESSION, 9])
 
         #################compute object center###################
+        self.model_name = model_name
         object_center_fn = f'data/google_scanned_objects/{model_name}/object_center.pkl'
         if os.path.exists(object_center_fn):
             self.object_center = read_pickle(object_center_fn)
@@ -463,7 +464,6 @@ class GoogleScannedObjectDatabase(BaseDatabase):
         else:
             self.object_diameter = self._get_diameter()
             save_pickle(self.object_diameter, object_diameter_fn)
-        self.model_name = model_name
 
     def get_raw_depth(self, img_id):
         img = Image.open(f'{self.prefix}/depth/{int(img_id):06}.png')
