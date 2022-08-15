@@ -1065,7 +1065,7 @@ class SelectionValDataset(Dataset):
         "test_database_name": 'linemod/cat',
         "ref_database_name": 'linemod/cat',
         "test_split_type": "linemod_val",
-        "ref_split": "linemod_val",
+        "ref_split_type": "linemod_val",
         "selector_ref_num": 32,
         "selector_ref_res": 128,
         'selector_angles': [-90, -45, 0, 45, 90],
@@ -1076,7 +1076,7 @@ class SelectionValDataset(Dataset):
         assert(not is_train)
         self.test_database = parse_database_name(self.cfg['test_database_name'])
         self.ref_database = parse_database_name(self.cfg['ref_database_name'])
-        ref_ids, _ = get_database_split(self.ref_database,self.cfg['ref_split'])
+        ref_ids, _ = get_database_split(self.ref_database,self.cfg['ref_split_type'])
         _, self.test_ids = get_database_split(self.test_database,self.cfg['test_split_type'])
 
         rots = np.deg2rad(self.cfg['selector_angles'])
