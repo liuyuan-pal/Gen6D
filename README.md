@@ -134,7 +134,7 @@ python prepare.py --action gen_val_set \
 This command will generate the information in the `data/val`, which will be used in producing validation data for the refiner.
 7. Train the refiner
 ```shell
-python train_model.py --cfg configs/selector/refiner_train.yaml
+python train_model.py --cfg configs/refiner/refiner_train.yaml
 ```
 8. Evaluate all components together.
 ```shell
