@@ -168,12 +168,21 @@ class GenMOPMetaInfoWrapper:
         return R
 
 def parse_colmap_project(cameras, images, img_fns):
-    img_id2db_id = {v.name[:-4]:k for k, v in images.items()}
+    v = images[[k for k in images.keys()][0]]
+    is_windows_colmap = v.name.startswith('frame')
+    if is_windows_colmap:
+        img_id2db_id = {v.name: k for k, v in images.items()}
+    else:
+        img_id2db_id = {v.name[:-4]:k for k, v in images.items()}
     poses, Ks = {}, {}
     img_ids = [str(k) for k in range(len(img_fns))]
     for img_id in img_ids:
-        if img_id not in img_id2db_id: continue
-        db_id = img_id2db_id[img_id]
+        if is_windows_colmap:
+            if img_fns[int(img_id)] not in img_id2db_id: continue
+            db_id = img_id2db_id[img_fns[int(img_id)]]
+        else:
+            if img_id not in img_id2db_id: continue
+            db_id = img_id2db_id[img_id]
         R = images[db_id].qvec2rotmat()
         t = images[db_id].tvec
         pose = np.concatenate([R,t[:,None]],1).astype(np.float32)
