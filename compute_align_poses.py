@@ -147,7 +147,7 @@ if __name__=="__main__":
     imsave('data/vis-tformer-anno.jpg', # note: output image will be saved in this path
            concat_images_list(draw_keypoints(ref_img0, ref_kps0, colors),
                               draw_keypoints(ref_img1, ref_kps1, colors),
-                              draw_keypoints(test_img0, test_kps1, colors),
+                              draw_keypoints(test_img0, test_kps0, colors),
                               draw_keypoints(test_img1, test_kps1, colors),
                               )
            )
