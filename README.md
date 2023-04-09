@@ -145,6 +145,19 @@ python eval.py --cfg configs/gen6d_train.yaml --object_name genmop/tformer
 python eval.py --cfg configs/gen6d_train.yaml --object_name linemod/cat
 ```
 
+### How to make a GenMOP object for evaluation
+
+The process of making the GenMOP dataset is described as follows:
+1. run SfM on the reference sequence using COLMAP.
+2. run SfM on the test sequence using COLMAP. **Note the test sequence for evaluation need be captured in a static scene.**
+3. Manually label at least 4 keypoints on two images from the query sequence and label the same 4 keypoints on two images from the test sequence. 
+   For example, we label 4 keypoints on the frame40.jpg and frame620.jpg from the reference sequence of the `TFormer` object, which is stored in `aling-data/tformer-anno/ref-frame40(620)`.
+   And we label 4 keypoints on the frame130.jpg and frame540.jpg from the test sequence of the `TFormer` object, which is stored in `aling-data/tformer-anno/test-frane130(540)`.
+4. Compute the alignment poses and scale for two sequences and save the results in `align.pkl` in `tformer-test/`. We provide an example in `compute_align_poses.py`.
+5. With `align.pkl`, you may use the `GenMOPDatabase` by `parse_database_name('genmop/tformer-que')` and `parse_database_name('genmop/tformer-que')`.
+
+We use the annotation tools from https://github.com/luigivieira/Facial-Landmarks-Annotation-Tool to label keypoints for the GenMOP dataset.
+
 ## Acknowledgements
 In this repository, we have used codes or datasets from the following repositories. 
 We thank all the authors for sharing great codes or datasets.

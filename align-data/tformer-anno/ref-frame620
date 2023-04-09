@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<FaceDataset xmlns="https://github.com/luigivieira/Facial-Landmarks-Annotation-Tool" numberOfFeatures="4">
+    <Samples>
+        <Sample fileName="../warrior-ref/images/frame620.jpg">
+            <Features>
+                <Feature id="0" x="169" y="443">
+                    <Connections/>
+                </Feature>
+                <Feature id="1" x="240" y="514">
+                    <Connections/>
+                </Feature>
+                <Feature id="2" x="251" y="535">
+                    <Connections/>
+                </Feature>
+                <Feature id="3" x="237" y="416">
+                    <Connections/>
+                </Feature>
+            </Features>
+        </Sample>
+    </Samples>
+</FaceDataset>
