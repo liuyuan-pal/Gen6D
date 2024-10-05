@@ -83,7 +83,7 @@ Please refer to [custom_object.md](custom_object.md)
 
 ## Training
 1. ~~Download processed [co3d](https://ai.facebook.com/datasets/CO3D-dataset/) data (co3d.tar.gz), [google scanned objects](https://arxiv.org/abs/2204.11918) data (google_scanned_objects.tar.gz) and [ShapeNet](http://shapenet.org/) renderings (shapenet.tar.gz) at [here](https://connecthkuhk-my.sharepoint.com/:f:/g/personal/yuanly_connect_hku_hk/EkWESLayIVdEov4YlVrRShQBkOVTJwgK0bjF7chFg2GrBg?e=Y8UpXu).~~ The training set is not provided anymore. You may need to read the codes and process them yourself.
-~~2. Download [COCO](https://cocodataset.org/#download) 2017 training set.~~
+2. ~~Download [COCO](https://cocodataset.org/#download) 2017 training set.~~
 3. Organize files like
 ```shell
 Gen6D
