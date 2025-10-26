@@ -4,6 +4,10 @@ Gen6D is able to estimate 6DoF poses for unseen objects like the following video
 
 ![](assets/example.gif)
 
+###Update
+
+All OneDrive links are broken and you can find relevant resources in this [link](https://drive.google.com/drive/folders/16AaqgeaLAFiZiFwquBM3qWXxVFbjBx9D?usp=sharing).
+
 ## [Project page](https://liuyuan-pal.github.io/Gen6D/) | [Paper](https://arxiv.org/abs/2204.10776)
 
 ## Todo List
